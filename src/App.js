@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { makeLoyaltyReq } from './utils/loyaltyUtil';
 import { useLoyaltyStorage } from './hooks/useLocalStorage';
 
 function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [loyaltyAcct, setLoyaltyAcct] = useLoyaltyStorage(null);
 
   useEffect(() => {
     const getLoyaltyStatus = async () => {
       if (!loyaltyAcct) {
-        console.log('** Not found in storage or expired, making request **');
         const response = await makeLoyaltyReq();
         setLoyaltyAcct(response);
-      } else {
-        console.log('** Found in storage and not expired, not making request **');
-        setIsLoaded(true);
       }
     };
     getLoyaltyStatus();
@@ -23,8 +18,8 @@ function App() {
 
   return (
     <div>
-      {!isLoaded && <p>Fetching</p>}
-      {isLoaded &&
+      {!loyaltyAcct && <p>Loading</p>}
+      {loyaltyAcct &&
         loyaltyAcct.data.map(imgUrl => {
           return <img key={imgUrl} src={imgUrl} alt='img' />;
         })}
